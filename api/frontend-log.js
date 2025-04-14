@@ -1,4 +1,6 @@
 
+import { createClient } from '@supabase/supabase-js';
+
 export default async function handler(req, res) {
   try {
     if (req.method !== 'POST') {
@@ -28,8 +30,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // Import supabase directly to avoid module resolution issues
-    const { createClient } = require('@supabase/supabase-js');
+    // Create Supabase client directly instead of using require
     const supabase = createClient(
       process.env.SUPABASE_URL || '',
       process.env.SUPABASE_SERVICE_ROLE_KEY || ''
