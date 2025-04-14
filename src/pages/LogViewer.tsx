@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import LogTable from '@/components/LogTable';
 import LogFilter from '@/components/LogFilter';
 import LogPagination from '@/components/LogPagination';
+import DeleteLogsButton from '@/components/DeleteLogsButton';
 import { LogTable as TableType } from '@/lib/supabase';
 
 interface LogViewerProps {
@@ -21,7 +22,7 @@ const LogViewer = ({ type }: LogViewerProps) => {
 
   const tableType: TableType = type === 'backend' ? 'backend_logs' : 'frontend_logs';
   
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['logs', tableType, filters],
     queryFn: () => fetchLogs(tableType, filters),
   });
@@ -36,13 +37,16 @@ const LogViewer = ({ type }: LogViewerProps) => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">
-          {type === 'backend' ? 'Backend' : 'Frontend'} Logs
-        </h1>
-        <p className="text-muted-foreground">
-          View and analyze {type === 'backend' ? 'backend' : 'frontend'} application logs
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">
+            {type === 'backend' ? 'Backend' : 'Frontend'} Logs
+          </h1>
+          <p className="text-muted-foreground">
+            View and analyze {type === 'backend' ? 'backend' : 'frontend'} application logs
+          </p>
+        </div>
+        <DeleteLogsButton table={tableType} onSuccess={refetch} />
       </div>
 
       <Card>

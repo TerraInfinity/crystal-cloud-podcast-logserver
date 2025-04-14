@@ -74,3 +74,15 @@ export const insertLog = async (
 
   return data[0] as LogEntry;
 };
+
+export const deleteAllLogs = async (table: LogTable): Promise<void> => {
+  const { error } = await supabase
+    .from(table)
+    .delete()
+    .not('id', 'is', null); // This ensures we're deleting all records
+
+  if (error) {
+    console.error('Error deleting logs:', error);
+    throw new Error(`Failed to delete logs: ${error.message}`);
+  }
+};
