@@ -1,73 +1,98 @@
-# Welcome to your Lovable project
 
-## Project info
+# LogVista Guardian
 
-**URL**: https://lovable.dev/projects/1a5d55af-72f6-4cfc-b7f6-94704e115346
+A modern web application for viewing and analyzing both backend and frontend logs.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- Separate views for backend and frontend logs
+- Filterable and searchable logs
+- Expandable log details for additional data
+- Dark theme with color-coded log levels
+- Responsive design that works on all screen sizes
+- Secure API endpoints for posting logs
 
-**Use Lovable**
+## Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/1a5d55af-72f6-4cfc-b7f6-94704e115346) and start prompting.
+- React with TypeScript
+- TailwindCSS & shadcn/ui for styling
+- React Query for data fetching
+- Supabase for database storage
+- Vercel for hosting and serverless functions
 
-Changes made via Lovable will be committed automatically to this repo.
+## Supabase Setup
 
-**Use your preferred IDE**
+### Database Setup
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Create two tables in your Supabase project:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. `backend_logs`
+2. `frontend_logs`
 
-Follow these steps:
+Each table should have the following schema:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+```sql
+create table backend_logs (
+  id uuid primary key default uuid_generate_v4(),
+  created_at timestamp with time zone default now(),
+  level text not null,
+  message text not null,
+  data jsonb
+);
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+create table frontend_logs (
+  id uuid primary key default uuid_generate_v4(),
+  created_at timestamp with time zone default now(),
+  level text not null,
+  message text not null,
+  data jsonb
+);
 ```
 
-**Edit a file directly in GitHub**
+Make sure to set appropriate RLS (Row Level Security) policies for these tables.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Environment Variables
 
-**Use GitHub Codespaces**
+Create a `.env` file based on the `.env.example` file with the following variables:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```
+VITE_SUPABASE_URL=your-supabase-url
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+VITE_API_KEY=your-api-key-for-log-endpoints
+```
 
-## What technologies are used for this project?
+## Deploying to Vercel
 
-This project is built with:
+1. Push this project to a GitHub repository
+2. Connect the repository to Vercel
+3. Configure the environment variables in Vercel project settings
+4. Deploy the project
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Using the Log API
 
-## How can I deploy this project?
+To send logs to the API:
 
-Simply open [Lovable](https://lovable.dev/projects/1a5d55af-72f6-4cfc-b7f6-94704e115346) and click on Share -> Publish.
+### Backend Logs
 
-## Can I connect a custom domain to my Lovable project?
+```bash
+curl -X POST https://your-domain.com/api/backend-log \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: your-api-key" \
+  -d '{"level": "info", "message": "This is a test log", "data": {"user": "test"}}'
+```
 
-Yes, you can!
+### Frontend Logs
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+```bash
+curl -X POST https://your-domain.com/api/frontend-log \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: your-api-key" \
+  -d '{"level": "error", "message": "Failed to load resource", "data": {"url": "/api/test"}}'
+```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## Local Development
+
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Create a `.env` file with the required variables
+4. Start the development server: `npm run dev`
