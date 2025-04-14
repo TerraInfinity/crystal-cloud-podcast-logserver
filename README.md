@@ -56,8 +56,8 @@ Make sure to set appropriate RLS (Row Level Security) policies for these tables.
 Create a `.env` file based on the `.env.example` file with the following variables:
 
 ```
-SUPABASE_URL=your-supabase-url
-SUPABASE_ANON_KEY=your-supabase-anon-key
+SUPABASE_URL=https://tpjlmokgivhurtcdwjil.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwamxtb2tnaXZodXJ0Y2R3amlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ2MTI3NjIsImV4cCI6MjA2MDE4ODc2Mn0.pbPyp9dPmMW0V7CIBejJRRoK8BhtzvSMiYNFel1qghE
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwamxtb2tnaXZodXJ0Y2R3amlsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NDYxMjc2MiwiZXhwIjoyMDYwMTg4NzYyfQ.qL4zQ_TYwIZcb08w-Hur2pQcMigeCGTjnv4GFeJuSus
 VITE_API_KEY=your-api-key-for-log-endpoints
 ```
