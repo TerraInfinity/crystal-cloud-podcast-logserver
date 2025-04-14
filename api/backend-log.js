@@ -35,7 +35,7 @@ export default async function handler(req, res) {
             process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwamxtb2tnaXZodXJ0Y2R3amlsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NDYxMjc2MiwiZXhwIjoyMDYwMTg4NzYyfQ.qL4zQ_TYwIZcb08w-Hur2pQcMigeCGTjnv4GFeJuSus'
         );
 
-        // Insert log into Supabase
+        // Insert log into Supabase 
         const { data, error } = await supabase
             .from('backend_logs')
             .insert({
