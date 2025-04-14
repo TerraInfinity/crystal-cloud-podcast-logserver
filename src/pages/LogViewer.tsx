@@ -1,7 +1,7 @@
+/// <reference types="react" />
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { fetchLogs } from '@/services/logService';
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 import { LogFilterParams } from '@/types/logs';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import LogTable from '@/components/LogTable';
@@ -10,11 +10,21 @@ import LogPagination from '@/components/LogPagination';
 import DeleteLogsButton from '@/components/DeleteLogsButton';
 import { LogTable as TableType } from '@/lib/supabase';
 
+interface LogItem {
+  id: number;
+  level: string;
+  message: string;
+  created_at: string;
+  data?: any;
+}
+
 interface LogViewerProps {
-  type: 'frontend' | 'backend';
+  type: "frontend" | "backend";
 }
 
 const LogViewer = ({ type }: LogViewerProps) => {
+  const [logs, setLogs] = useState<LogItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [filters, setFilters] = useState<LogFilterParams>({
     page: 1,
     pageSize: 20,
@@ -22,10 +32,30 @@ const LogViewer = ({ type }: LogViewerProps) => {
 
   const tableType: TableType = type === 'backend' ? 'backend_logs' : 'frontend_logs';
   
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['logs', tableType, filters],
-    queryFn: () => fetchLogs(tableType, filters),
-  });
+  const fetchLogs = async () => {
+    setLoading(true);
+    const table = type === "frontend" ? "frontend_logs" : "backend_logs";
+    const { data, error } = await supabase
+      .from(table)
+      .select();
+    if (error) {
+      console.error("Error fetching logs:", error);
+    } else if (data) {
+      const sortedData = (data as LogItem[]).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      setLogs(sortedData);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchLogs();
+    const intervalId = setInterval(fetchLogs, 10000); // Refresh every 10 seconds
+    return () => clearInterval(intervalId);
+  }, [type]);
+
+  const handleRefresh = () => {
+    fetchLogs();
+  };
 
   const handleFilterChange = (newFilters: LogFilterParams) => {
     setFilters({ ...filters, ...newFilters });
@@ -46,7 +76,7 @@ const LogViewer = ({ type }: LogViewerProps) => {
             View and analyze {type === 'backend' ? 'backend' : 'frontend'} application logs
           </p>
         </div>
-        <DeleteLogsButton table={tableType} onSuccess={refetch} />
+        <DeleteLogsButton table={tableType} />
       </div>
 
       <Card>
@@ -62,7 +92,7 @@ const LogViewer = ({ type }: LogViewerProps) => {
             </div>
           ) : (
             <>
-              <LogTable logs={data?.logs || []} isLoading={isLoading} />
+              <LogTable logs={logs} isLoading={loading} />
               
               {data && (
                 <LogPagination
