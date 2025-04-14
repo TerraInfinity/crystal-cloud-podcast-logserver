@@ -15,25 +15,9 @@ interface LogTableProps {
 
 const LogTable = ({ logs, isLoading }: LogTableProps) => {
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
-  const [expandedIncomingRows, setExpandedIncomingRows] = useState<Record<string, boolean>>({});
-  const [expandedOutgoingRows, setExpandedOutgoingRows] = useState<Record<string, boolean>>({});
 
   const toggleRow = (id: string) => {
     setExpandedRows((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
-
-  const toggleIncoming = (id: string) => {
-    setExpandedIncomingRows((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
-
-  const toggleOutgoing = (id: string) => {
-    setExpandedOutgoingRows((prev) => ({
       ...prev,
       [id]: !prev[id],
     }));
@@ -101,41 +85,11 @@ const LogTable = ({ logs, isLoading }: LogTableProps) => {
                 <TableCell onClick={() => toggleRow(log.id)} className="max-w-md truncate">
                   {log.message}
                 </TableCell>
-                <TableCell className="max-w-xs truncate flex items-center">
-                  <span onClick={() => toggleRow(log.id)} className="flex-1">
-                    {log.data && log.data.incoming ? (JSON.stringify(log.data.incoming).length > 50 ? JSON.stringify(log.data.incoming).substring(0,50) + '...' : JSON.stringify(log.data.incoming)) : '-'}
-                  </span>
-                  {log.data && log.data.incoming && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => { e.stopPropagation(); toggleIncoming(log.id); }}
-                    >
-                      {expandedIncomingRows[log.id] ? (
-                        <ChevronUp className="h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4" />
-                      )}
-                    </Button>
-                  )}
+                <TableCell onClick={() => toggleRow(log.id)} className="max-w-xs truncate">
+                  {log.data && log.data.incoming ? JSON.stringify(log.data.incoming) : '-'}
                 </TableCell>
-                <TableCell className="max-w-xs truncate flex items-center">
-                  <span onClick={() => toggleRow(log.id)} className="flex-1">
-                    {log.data && log.data.outgoing ? (JSON.stringify(log.data.outgoing).length > 50 ? JSON.stringify(log.data.outgoing).substring(0,50) + '...' : JSON.stringify(log.data.outgoing)) : '-'}
-                  </span>
-                  {log.data && log.data.outgoing && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => { e.stopPropagation(); toggleOutgoing(log.id); }}
-                    >
-                      {expandedOutgoingRows[log.id] ? (
-                        <ChevronUp className="h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4" />
-                      )}
-                    </Button>
-                  )}
+                <TableCell onClick={() => toggleRow(log.id)} className="max-w-xs truncate">
+                  {log.data && log.data.outgoing ? JSON.stringify(log.data.outgoing) : '-'}
                 </TableCell>
                 <TableCell className="text-right">
                   <Button
@@ -152,42 +106,33 @@ const LogTable = ({ logs, isLoading }: LogTableProps) => {
                   </Button>
                 </TableCell>
               </TableRow>
-              {expandedIncomingRows[log.id] && log.data && log.data.incoming && (
-                <TableRow>
-                  <TableCell colSpan={6} className="bg-secondary/30 p-4">
-                    <div className="rounded bg-card p-4">
-                      <h4 className="font-bold mb-2">Incoming Details</h4>
-                      <pre className="text-xs overflow-auto font-mono whitespace-pre-wrap">
-                        {JSON.stringify(log.data.incoming, null, 2)}
-                      </pre>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-              {expandedOutgoingRows[log.id] && log.data && log.data.outgoing && (
-                <TableRow>
-                  <TableCell colSpan={6} className="bg-secondary/30 p-4">
-                    <div className="rounded bg-card p-4">
-                      <h4 className="font-bold mb-2">Outgoing Details</h4>
-                      <pre className="text-xs overflow-auto font-mono whitespace-pre-wrap">
-                        {JSON.stringify(log.data.outgoing, null, 2)}
-                      </pre>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
               {expandedRows[log.id] && log.data && (
                 <TableRow>
                   <TableCell colSpan={6} className="bg-secondary/30 p-4">
-                    <div className="rounded bg-card p-4">
-                      <pre className="text-xs overflow-auto font-mono whitespace-pre-wrap">
-                        {JSON.stringify((() => {
-                          const details = { ...log.data };
-                          delete details.incoming;
-                          delete details.outgoing;
-                          return details;
-                        })(), null, 2)}
-                      </pre>
+                    <div className="rounded bg-card p-4 space-y-4">
+                      <div>
+                        <h4 className="font-bold mb-2">Incoming Details</h4>
+                        <pre className="text-xs overflow-auto font-mono whitespace-pre-wrap">
+                          {JSON.stringify(log.data.incoming || {}, null, 2)}
+                        </pre>
+                      </div>
+                      <div>
+                        <h4 className="font-bold mb-2">Outgoing Details</h4>
+                        <pre className="text-xs overflow-auto font-mono whitespace-pre-wrap">
+                          {JSON.stringify(log.data.outgoing || {}, null, 2)}
+                        </pre>
+                      </div>
+                      <div>
+                        <h4 className="font-bold mb-2">Other Details</h4>
+                        <pre className="text-xs overflow-auto font-mono whitespace-pre-wrap">
+                          {JSON.stringify((() => {
+                            const details = { ...log.data };
+                            delete details.incoming;
+                            delete details.outgoing;
+                            return details;
+                          })(), null, 2)}
+                        </pre>
+                      </div>
                     </div>
                   </TableCell>
                 </TableRow>
