@@ -1,5 +1,3 @@
-/// <reference types="react" />
-
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { LogFilterParams } from '@/types/logs';
@@ -29,7 +27,10 @@ const LogViewer = ({ type }: LogViewerProps) => {
     page: 1,
     pageSize: 20,
   });
-
+  
+  // New state for auto refresh toggle (default off)
+  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState<boolean>(false);
+  
   const tableType: TableType = type === 'backend' ? 'backend_logs' : 'frontend_logs';
   
   const fetchLogs = async () => {
@@ -48,9 +49,14 @@ const LogViewer = ({ type }: LogViewerProps) => {
 
   useEffect(() => {
     fetchLogs();
-    const intervalId = setInterval(fetchLogs, 10000); // Refresh every 10 seconds
-    return () => clearInterval(intervalId);
-  }, [type]);
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+    if (autoRefreshEnabled) {
+      intervalId = setInterval(fetchLogs, 10000); // Refresh every 10 seconds when enabled
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [type, autoRefreshEnabled]);
 
   const handleFilterChange = (newFilters: LogFilterParams) => {
     setFilters({ ...filters, ...newFilters });
@@ -71,7 +77,19 @@ const LogViewer = ({ type }: LogViewerProps) => {
             View and analyze {type === 'backend' ? 'backend' : 'frontend'} application logs
           </p>
         </div>
-        <DeleteLogsButton table={tableType} onSuccess={fetchLogs} />
+        <div className="flex items-center space-x-4">
+          <DeleteLogsButton table={tableType} onSuccess={fetchLogs} />
+          <div className="flex items-center">
+            <label htmlFor="autoRefreshToggle" className="mr-2">Auto Refresh</label>
+            <input
+              id="autoRefreshToggle"
+              type="checkbox"
+              className="toggle"
+              checked={autoRefreshEnabled}
+              onChange={(e) => setAutoRefreshEnabled(e.target.checked)}
+            />
+          </div>
+        </div>
       </div>
 
       <Card>
