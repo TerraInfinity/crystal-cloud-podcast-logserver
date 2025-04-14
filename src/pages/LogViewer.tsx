@@ -2,10 +2,9 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchLogs } from '@/services/logService';
-import { LogTable } from '@/components/ui/table';
 import { LogFilterParams } from '@/types/logs';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { LogTable as LogTableComponent } from '@/components/LogTable';
+import LogTable from '@/components/LogTable';
 import LogFilter from '@/components/LogFilter';
 import LogPagination from '@/components/LogPagination';
 import { LogTable as TableType } from '@/lib/supabase';
@@ -59,7 +58,7 @@ const LogViewer = ({ type }: LogViewerProps) => {
             </div>
           ) : (
             <>
-              <LogTableComponent logs={data?.logs || []} isLoading={isLoading} />
+              <LogTable logs={data?.logs || []} isLoading={isLoading} />
               
               {data && (
                 <LogPagination
