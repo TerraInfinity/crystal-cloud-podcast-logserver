@@ -62,7 +62,10 @@ export const insertLog = async (
   table: LogTable,
   log: Omit<LogEntry, 'id' | 'created_at'>
 ) => {
-  const { data, error } = await supabase.from(table).insert(log).select('*');
+  const { data, error } = await supabase
+    .from(table)
+    .insert(log)
+    .select('*');
 
   if (error) {
     console.error('Error inserting log:', error);

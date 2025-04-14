@@ -43,11 +43,14 @@ export async function POST(request: Request) {
     }
 
     // Insert log into Supabase
-    const { data, error } = await supabase.from("frontend_logs").insert({
-      level: body.level,
-      message: body.message,
-      data: body.data || null,
-    }).select();
+    const { data, error } = await supabase
+      .from('frontend_logs')
+      .insert({
+        level: body.level,
+        message: body.message,
+        data: body.data || null,
+      })
+      .select();
 
     if (error) {
       console.error("Error inserting log:", error);

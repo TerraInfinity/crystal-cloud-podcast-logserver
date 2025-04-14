@@ -1,6 +1,7 @@
 
 import { supabase } from "@/lib/supabase";
 import { LogLevel } from "@/types/logs";
+import { Database } from '@/integrations/supabase/types';
 
 export interface LogRequest {
   level: LogLevel;
@@ -43,11 +44,14 @@ export async function POST(request: Request) {
     }
 
     // Insert log into Supabase
-    const { data, error } = await supabase.from("backend_logs").insert({
-      level: body.level,
-      message: body.message,
-      data: body.data || null,
-    }).select();
+    const { data, error } = await supabase
+      .from('backend_logs')
+      .insert({
+        level: body.level,
+        message: body.message,
+        data: body.data || null,
+      })
+      .select();
 
     if (error) {
       console.error("Error inserting log:", error);
