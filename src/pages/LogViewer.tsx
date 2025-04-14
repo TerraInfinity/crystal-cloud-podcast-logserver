@@ -1,6 +1,6 @@
 /// <reference types="react" />
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { LogFilterParams } from '@/types/logs';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -34,9 +34,8 @@ const LogViewer = ({ type }: LogViewerProps) => {
   
   const fetchLogs = async () => {
     setLoading(true);
-    const table = type === "frontend" ? "frontend_logs" : "backend_logs";
     const { data, error } = await supabase
-      .from(table)
+      .from(tableType)
       .select();
     if (error) {
       console.error("Error fetching logs:", error);
@@ -52,10 +51,6 @@ const LogViewer = ({ type }: LogViewerProps) => {
     const intervalId = setInterval(fetchLogs, 10000); // Refresh every 10 seconds
     return () => clearInterval(intervalId);
   }, [type]);
-
-  const handleRefresh = () => {
-    fetchLogs();
-  };
 
   const handleFilterChange = (newFilters: LogFilterParams) => {
     setFilters({ ...filters, ...newFilters });
@@ -76,7 +71,7 @@ const LogViewer = ({ type }: LogViewerProps) => {
             View and analyze {type === 'backend' ? 'backend' : 'frontend'} application logs
           </p>
         </div>
-        <DeleteLogsButton table={tableType} />
+        <DeleteLogsButton table={tableType} onSuccess={fetchLogs} />
       </div>
 
       <Card>
@@ -86,19 +81,19 @@ const LogViewer = ({ type }: LogViewerProps) => {
         <CardContent>
           <LogFilter filters={filters} onFilterChange={handleFilterChange} />
           
-          {error ? (
-            <div className="mt-8 p-4 bg-destructive/10 text-destructive rounded-md">
-              Error loading logs: {(error as Error).message}
+          {loading ? (
+            <div className="mt-8 p-4">
+              Loading logs...
             </div>
           ) : (
             <>
               <LogTable logs={logs} isLoading={loading} />
               
-              {data && (
+              {logs.length > 0 && (
                 <LogPagination
-                  currentPage={data.page}
-                  totalItems={data.count}
-                  pageSize={data.pageSize}
+                  currentPage={filters.page}
+                  totalItems={logs.length}
+                  pageSize={filters.pageSize}
                   onPageChange={handlePageChange}
                 />
               )}
